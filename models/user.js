@@ -12,7 +12,19 @@ const userSchema = new Schema({
   name: {
     type: String,
     required: true
+  },
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
+  balance: {
+    type: Number,
+    default: 0
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false
   }
 })
 
-module.exports = model('User', userSchema)
+module.exports = model('User', userSchema) 
