@@ -6,18 +6,17 @@ const path        = require('path')
 const helmet      = require('helmet')
 const cors        = require('cors')
 const ccxws       = require("ccxws");
+const socketUsers = require('socket.io.users');
+let tradeData     = {}
 const binance     = new ccxws.Binance();
                     require('dotenv').config()
 
-const market = {
-  id: "BTCUSDT", // remote_id used by the exchange
-  base: "BTC", // standardized base symbol for Bitcoin
-  quote: "USDT", // standardized quote symbol for Tether
-};
 
 
 /* Middleware */
-// const notFoundRequest = require('./middleware/404')
+
+
+ /* Modules */
 
 
 /* Routes */
@@ -27,6 +26,8 @@ const resetRoutes = require('./routes/auth/reset')
 
 /* Application initialization */
 const app = express()
+
+socketUsers.Session(app)
 
 /* For access to public files */
 app.use(express.static(path.join(__dirname, 'public')))
@@ -58,7 +59,6 @@ app.use(function (err, req, res, next) {
 });
 
 
-
 async function start() {
   try {
     await mongoose.connect('mongodb+srv://emil:emil1111@cluster0.e1kvc.mongodb.net/traiding', {
@@ -66,26 +66,37 @@ async function start() {
       useNewUrlParser: true,
       useFindAndModify: false
     })
+    
+    const server    = app.listen(3000)
+          io        = require('socket.io')(server);
+          rootUsers = socketUsers.Users
 
-    const server = app.listen(3000)
-    const io = require('socket.io')(server);
+    io.use(socketUsers.Middleware());
 
-    io.on('connection', function(socket) {
-      socket.on('SEND_MESSAGE', function(some) {
-        console.log("start -> some", some)
+    rootUsers.on('connected', function(user){
+      console.log('User has connected with ID: '+ user.id);
+    });
+    
+    rootUsers.on('disconnected',function(user){
+      console.log('User with ID: '+user.id+'is gone away :(');
+    });
+    
+    io.on('connection', function(socket){
+      socket.on('SEND_MESSAGE', function(market) {
         binance.subscribeTrades(market);
-        // handle trade events
-        binance.on("trade", trade => {
-          console.log("start -> trade", trade)
-          io.emit('MESSAGE', trade)
-        })
+        binance.on("trade", trade => tradeData = trade)
       });
     });
+
+    setInterval(() => {
+      io.emit('MESSAGE', tradeData)
+    }, 1000)
 
   } catch (e) {
     console.log(e)
   }
 }
+
 start()
 
 
