@@ -7,13 +7,45 @@ const helmet      = require('helmet')
 const cors        = require('cors')
 const ccxws       = require("ccxws");
 const socketUsers = require('socket.io.users');
-let tradeData     = {}
-const binance     = new ccxws.Binance();
                     require('dotenv').config()
 
-
-
 /* Middleware */
+const addTradeToDb = require('./middleware/addNewRecords')
+const deleteOldRecords = require('./middleware/deleteOldRecords')
+/* Trade options */
+const options = [
+  {
+    id: 'LTCUSDT',
+    base: 'LTC',
+    quote: 'USDT'
+  },
+  {
+    id: 'BTCUSDT',
+    base: 'BTC',
+    quote: 'USDT'
+  },
+]
+async function subscribeForTrade (market, binance) {
+  let tradeData
+  await binance.subscribeTrades(market)
+  await binance.on("trade", trade => {
+    tradeData = trade
+  })
+  
+  await setInterval(async () => {
+    await addTradeToDb(tradeData)
+  }, 1000)
+}
+
+setInterval (async () => {
+  await deleteOldRecords()
+}, 1000)
+
+options.forEach(async market => {
+  let binance = new ccxws.Binance()
+  await subscribeForTrade(market, binance)
+});
+
 
 
  /* Modules */
@@ -23,6 +55,8 @@ const binance     = new ccxws.Binance();
 const registrationRoutes = require('./routes/auth/registration')
 const loginRoutes = require('./routes/auth/login')
 const resetRoutes = require('./routes/auth/reset')
+const pairs = require('./routes/trade/pairs')
+const getChartData = require('./routes/trade/getChartData')
 
 /* Application initialization */
 const app = express()
@@ -45,6 +79,8 @@ app.use(cors())
 app.use('/api', registrationRoutes)
 app.use('/api', loginRoutes)
 app.use('/api', resetRoutes)
+app.use('/api', pairs)
+app.use('/api', getChartData)
 
 
 // Error middleware after all routes
@@ -61,6 +97,8 @@ app.use(function (err, req, res, next) {
 
 async function start() {
   try {
+    let tradeData     = {}
+    const binance     = new ccxws.Binance()
     await mongoose.connect('mongodb+srv://emil:emil1111@cluster0.e1kvc.mongodb.net/traiding', {
       useUnifiedTopology: true, 
       useNewUrlParser: true,

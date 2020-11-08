@@ -1,8 +1,8 @@
-const User        = require('./../models/user')
+const MUser        = require('./../models/MUser')
 
 async function UserByToken (token) {
   try {
-    const user = await User.findOne({ token })
+    const user = await MUser.findOne({ token })
 
     if (user){
       return user

@@ -1,13 +1,13 @@
 const {Router}    = require('express') 
 const router      = Router()
 const bcrypt      = require('bcryptjs')
-const User        = require('../../models/user')
+const MUser        = require('../../models/MUser')
 const nodemailer  = require('nodemailer');
 
 router.post('/reset', async (req, res) => {
   try {
     console.log(" req.body",  req.body)
-    const candidate = await User.findOne({ email: req.body.email })
+    const candidate = await MUser.findOne({ email: req.body.email })
     
     
     if (candidate) {

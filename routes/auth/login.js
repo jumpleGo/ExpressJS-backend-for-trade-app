@@ -3,7 +3,7 @@ const router      = Router()
 const keys        = require('./../../keys/keys.prod.js')
 const jwt         = require('jsonwebtoken');
 const bcrypt      = require('bcryptjs')
-const User        = require('../../models/user')
+const MUser        = require('../../models/MUser')
 
 router.post('/login',  async (req, res) => {
   try {
@@ -11,7 +11,7 @@ router.post('/login',  async (req, res) => {
       user: req.body.email,
     }
 
-    const candidate = await User.findOne({ email: req.body.email })
+    const candidate = await MUser.findOne({ email: req.body.email })
     
     console.log("candidate", candidate)
     if (candidate) {

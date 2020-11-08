@@ -1,17 +1,17 @@
 const {Router}    = require('express') 
 const router      = Router()
 const bcrypt      = require('bcryptjs')
-const User        = require('../../models/user')
+const MUser        = require('../../models/MUser')
 
 router.post('/register', async (req, res) => {
   try {
     const {email, password, name} = req.body
   
-    const isAlrearyMember =  await User.findOne({ email: req.body.email })
+    const isAlrearyMember =  await MUser.findOne({ email: req.body.email })
     if (!isAlrearyMember) {
       const hashPassword = await bcrypt.hash(password, 10)
 
-      const user = new User({
+      const user = new MUser({
         email, password: hashPassword, name
       })
       await user.save()
