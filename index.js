@@ -6,46 +6,13 @@ const path        = require('path')
 const helmet      = require('helmet')
 const cors        = require('cors')
 const ccxws       = require("ccxws");
+let currMarket     = null
 const socketUsers = require('socket.io.users');
                     require('dotenv').config()
 
 /* Middleware */
 const addTradeToDb = require('./middleware/addNewRecords')
 const deleteOldRecords = require('./middleware/deleteOldRecords')
-/* Trade options */
-const options = [
-  {
-    id: 'LTCUSDT',
-    base: 'LTC',
-    quote: 'USDT'
-  },
-  {
-    id: 'BTCUSDT',
-    base: 'BTC',
-    quote: 'USDT'
-  },
-]
-async function subscribeForTrade (market, binance) {
-  let tradeData
-  await binance.subscribeTrades(market)
-  await binance.on("trade", trade => {
-    tradeData = trade
-  })
-  
-  await setInterval(async () => {
-    await addTradeToDb(tradeData)
-  }, 1000)
-}
-
-setInterval (async () => {
-  await deleteOldRecords()
-}, 1000)
-
-options.forEach(async market => {
-  let binance = new ccxws.Binance()
-  await subscribeForTrade(market, binance)
-});
-
 
 
  /* Modules */
@@ -97,7 +64,7 @@ app.use(function (err, req, res, next) {
 
 async function start() {
   try {
-    let tradeData     = {}
+    let tradeData     = null
     const binance     = new ccxws.Binance()
     await mongoose.connect('mongodb+srv://emil:emil1111@cluster0.e1kvc.mongodb.net/traiding', {
       useUnifiedTopology: true, 
@@ -120,14 +87,28 @@ async function start() {
     });
     
     io.on('connection', function(socket){
-      socket.on('SEND_MESSAGE', function(market) {
-        binance.subscribeTrades(market);
-        binance.on("trade", trade => tradeData = trade)
+
+      socket.on('SEND_MESSAGE', async function(market) {
+        if (!currMarket) {
+          currMarket = market
+          await binance.subscribeTrades(currMarket);
+          await binance.on("trade", trade => tradeData = trade)
+        } else if (currMarket.id === market.id){
+        } else if (currMarket.id !== market.id) {
+          tradeData = null
+          await binance.unsubscribeTrades(currMarket);
+          currMarket = market
+          await binance.subscribeTrades(currMarket);
+          binance.on("trade", trade => tradeData = trade)
+        }
       });
+
     });
 
     setInterval(() => {
-      io.emit('MESSAGE', tradeData)
+      if (tradeData) {
+        io.emit('MESSAGE', tradeData)
+      }
     }, 1000)
 
   } catch (e) {
@@ -136,6 +117,42 @@ async function start() {
 }
 
 start()
+
+/* Trade options */
+const options = [
+  {
+    id: 'LTCUSDT',
+    base: 'LTC',
+    quote: 'USDT'
+  },
+  {
+    id: 'BTCUSDT',
+    base: 'BTC',
+    quote: 'USDT'
+  },
+]
+async function subscribeForTrade (market, binance) {
+  let tradeData
+  await binance.subscribeTrades(market)
+  await binance.on("trade", trade => {
+    tradeData = trade
+  })
+  
+  await setInterval(async () => {
+    if (tradeData) {
+      await addTradeToDb(tradeData)
+    }
+  }, 1000)
+}
+
+setInterval (async () => {
+  await deleteOldRecords()
+}, 10000)
+
+options.forEach(async market => {
+  let binance = new ccxws.Binance()
+  await subscribeForTrade(market, binance)
+});
 
 
 
