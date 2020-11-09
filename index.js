@@ -21,6 +21,7 @@ const loginRoutes         = require('./routes/auth/login')
 const resetRoutes         = require('./routes/auth/reset')
 const pairs               = require('./routes/trade/pairs')
 const getChartData        = require('./routes/trade/getChartData')
+const createDeal          = require('./routes/deals/createDeal')
 
 /* Application initialization */
 const app = express()
@@ -45,6 +46,7 @@ app.use('/api', loginRoutes)
 app.use('/api', resetRoutes)
 app.use('/api', pairs)
 app.use('/api', getChartData)
+app.use('/api', createDeal)
 
 
 // Error middleware after all routes

@@ -18,7 +18,7 @@ async function subscribeForTrades () {
       if (tradeData) {
         await addTradeToDb(tradeData)
       }
-    }, 1000)
+    }, 2000)
   }
 
   options.forEach(async market => {
@@ -28,7 +28,7 @@ async function subscribeForTrades () {
 
   setInterval (async () => {
     await deleteOldRecords()
-  }, 10000)
+  }, 60000)
 }
 
 module.exports = subscribeForTrades
