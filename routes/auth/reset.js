@@ -31,7 +31,7 @@ router.post('/reset', async (req, res) => {
       });
       console.log("result", result)
 
-      await User.updateOne(
+      await MUser.updateOne(
         { email: req.body.email }, 
         { $set : { password: hashPassword } }
       )

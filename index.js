@@ -6,24 +6,21 @@ const path        = require('path')
 const helmet      = require('helmet')
 const cors        = require('cors')
 const ccxws       = require("ccxws");
-let currMarket     = null
+let currMarket    = null
 const socketUsers = require('socket.io.users');
                     require('dotenv').config()
 
-/* Middleware */
-const addTradeToDb = require('./middleware/addNewRecords')
-const deleteOldRecords = require('./middleware/deleteOldRecords')
-
-
- /* Modules */
+/* Api */
+const subscribeForTrades = require('./api/subscribeForTrades')
+/* Modules */
 
 
 /* Routes */
-const registrationRoutes = require('./routes/auth/registration')
-const loginRoutes = require('./routes/auth/login')
-const resetRoutes = require('./routes/auth/reset')
-const pairs = require('./routes/trade/pairs')
-const getChartData = require('./routes/trade/getChartData')
+const registrationRoutes  = require('./routes/auth/registration')
+const loginRoutes         = require('./routes/auth/login')
+const resetRoutes         = require('./routes/auth/reset')
+const pairs               = require('./routes/trade/pairs')
+const getChartData        = require('./routes/trade/getChartData')
 
 /* Application initialization */
 const app = express()
@@ -99,7 +96,7 @@ async function start() {
           await binance.unsubscribeTrades(currMarket);
           currMarket = market
           await binance.subscribeTrades(currMarket);
-          binance.on("trade", trade => tradeData = trade)
+          await binance.on("trade", trade => tradeData = trade)
         }
       });
 
@@ -117,42 +114,9 @@ async function start() {
 }
 
 start()
+subscribeForTrades()
 
-/* Trade options */
-const options = [
-  {
-    id: 'LTCUSDT',
-    base: 'LTC',
-    quote: 'USDT'
-  },
-  {
-    id: 'BTCUSDT',
-    base: 'BTC',
-    quote: 'USDT'
-  },
-]
-async function subscribeForTrade (market, binance) {
-  let tradeData
-  await binance.subscribeTrades(market)
-  await binance.on("trade", trade => {
-    tradeData = trade
-  })
-  
-  await setInterval(async () => {
-    if (tradeData) {
-      await addTradeToDb(tradeData)
-    }
-  }, 1000)
-}
 
-setInterval (async () => {
-  await deleteOldRecords()
-}, 10000)
-
-options.forEach(async market => {
-  let binance = new ccxws.Binance()
-  await subscribeForTrade(market, binance)
-});
 
 
 

@@ -1,4 +1,4 @@
-const MTrade        = require('../models/MTrade')
+const MTrade        = require('./../models/MTrade')
 
 async function addTradeToDb (trade) {
   try {

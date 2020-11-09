@@ -18,14 +18,13 @@ router.post('/login',  async (req, res) => {
       const areSame = await bcrypt.compare(req.body.password, candidate.password)
 
       if (areSame) {
-        const { name, email } = candidate
         const token = jwt.sign(user, keys.JWT_SECRET, {
           expiresIn: '5d'
         })
     
         res.json({
           token,
-          user: { name, email } 
+          user: candidate
         })
       } else {
         res.json({
