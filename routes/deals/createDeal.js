@@ -12,7 +12,8 @@ router.post('/createDeal', async (req, res) => {
       amount,
       startDate,
       endDate,
-      status
+      status,
+      currentPrice,
     } = req.body
 
     const deal = new MDeal({
@@ -23,7 +24,8 @@ router.post('/createDeal', async (req, res) => {
       amount,
       startDate,
       endDate,
-      status
+      status,
+      currentPrice
     })
     console.log("deal", deal)
     await deal.save()

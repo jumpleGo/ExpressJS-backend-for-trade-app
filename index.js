@@ -22,6 +22,8 @@ const resetRoutes         = require('./routes/auth/reset')
 const pairs               = require('./routes/trade/pairs')
 const getChartData        = require('./routes/trade/getChartData')
 const createDeal          = require('./routes/deals/createDeal')
+const checkAuth           = require('./routes/auth/checkAuth')
+const updateBalance       = require('./routes/user/updateBalance')
 
 /* Application initialization */
 const app = express()
@@ -47,6 +49,8 @@ app.use('/api', resetRoutes)
 app.use('/api', pairs)
 app.use('/api', getChartData)
 app.use('/api', createDeal)
+app.use('/api', checkAuth)
+app.use('/api', updateBalance)
 
 
 // Error middleware after all routes
@@ -90,14 +94,17 @@ async function start() {
       socket.on('SEND_MESSAGE', async function(market) {
         if (!currMarket) {
           currMarket = market
-          await binance.subscribeTrades(currMarket);
+          await binance.subscribeTrades(currMarket)
+          console.log('sub')
           await binance.on("trade", trade => tradeData = trade)
-        } else if (currMarket.id === market.id){
-        } else if (currMarket.id !== market.id) {
+
+        }else if (currMarket.id !== market.id) {
+          console.log('unsub')
+          await binance.unsubscribeTrades(currMarket)
           tradeData = null
-          await binance.unsubscribeTrades(currMarket);
           currMarket = market
-          await binance.subscribeTrades(currMarket);
+          await binance.subscribeTrades(currMarket)
+
           await binance.on("trade", trade => tradeData = trade)
         }
       });
@@ -108,7 +115,7 @@ async function start() {
       if (tradeData) {
         io.emit('MESSAGE', tradeData)
       }
-    }, 1000)
+    }, 3000)
 
   } catch (e) {
     console.log(e)

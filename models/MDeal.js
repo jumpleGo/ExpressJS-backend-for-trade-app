@@ -25,6 +25,10 @@ const deal = new Schema({
     type: String,
     required: true
   },
+  currentPrice: {
+    type: Number,
+    required: true
+  },
   startDate: {
     type: Date,
     required: true
