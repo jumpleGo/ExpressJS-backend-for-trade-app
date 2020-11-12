@@ -1,7 +1,8 @@
 const MPair             = require('./../models/MPair')
 const ccxws             = require("ccxws");
 const addTradeToDb      = require('./addNewRecords')
-const deleteOldRecords  = require('./deleteOldRecords')
+const deleteOldTrades   = require('./deleteOldTrades')
+const deleteOldCandles  = require('./deleteOldCandles')
 
 async function subscribeForTrades () {
   /* Trade options */
@@ -30,10 +31,12 @@ async function subscribeForTrades () {
     let binance = new ccxws.Binance()
     await subscribeForTrade(market, binance)
   });
-  await deleteOldRecords()
+  await deleteOldTrades()
+  await deleteOldCandles()
   setInterval (async () => {
-    await deleteOldRecords()
-  }, 60000)
+    await deleteOldTrades()
+    await deleteOldCandles()
+  }, 180000)
 }
 
 module.exports = subscribeForTrades

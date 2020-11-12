@@ -103,14 +103,23 @@ async function start() {
         if (!currMarket) {
           currMarket = market
           await binance.subscribeTrades(currMarket)
+          await binance.subscribeCandles(currMarket)
+
           await binance.on("trade", trade => tradeData = trade)
+          await binance.on("candle", candle => tradeCandle = candle)
 
         }else if (currMarket.id !== market.id) {
           await binance.unsubscribeTrades(currMarket)
+          await binance.unsubscribeCandles(currMarket)
           tradeData = null
+          tradeCandle = null
+
           currMarket = market
           await binance.subscribeTrades(currMarket)
+          await binance.subscribeCandles(currMarket)
+
           await binance.on("trade", trade => tradeData = trade)
+          await binance.on("candle", candle => tradeCandle = candle)
         }
       });
 
@@ -118,9 +127,12 @@ async function start() {
 
     setInterval(() => {
       if (tradeData) {
-        io.emit('MESSAGE', tradeData)
+        io.emit('MESSAGE_TRADE', tradeData)
       }
-    }, 3000)
+      if (tradeCandle) {
+        io.emit('MESSAGE_CANDLE', tradeCandle)
+      }
+    }, 1000)
 
   } catch (e) {
     console.log(e)
