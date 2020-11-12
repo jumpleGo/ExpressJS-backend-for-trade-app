@@ -29,7 +29,6 @@ router.post('/reset', async (req, res) => {
         subject: 'Сброс пароля',
         text: `Ваш новый пароль ${newPassword}`
       });
-      console.log("result", result)
 
       await MUser.updateOne(
         { email: req.body.email }, 

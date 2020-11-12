@@ -9,14 +9,19 @@ async function subscribeForTrades () {
 
   async function subscribeForTrade (market, binance) {
     let tradeData
+    let tradeCandle
     await binance.subscribeTrades(market)
-    await binance.on("trade", trade => {
-      tradeData = trade
-    })
+    await binance.subscribeCandles(market)
+
+    await binance.on("candle", candle => tradeCandle = candle)
+    await binance.on("trade", trade => tradeData = trade)
     
     await setInterval(async () => {
       if (tradeData) {
-        await addTradeToDb(tradeData)
+        await addTradeToDb(tradeData, 'line')
+      }
+      if (tradeCandle) {
+        await addTradeToDb(tradeCandle, 'candle', market.id)
       }
     }, 2000)
   }
@@ -25,7 +30,7 @@ async function subscribeForTrades () {
     let binance = new ccxws.Binance()
     await subscribeForTrade(market, binance)
   });
-
+  await deleteOldRecords()
   setInterval (async () => {
     await deleteOldRecords()
   }, 60000)

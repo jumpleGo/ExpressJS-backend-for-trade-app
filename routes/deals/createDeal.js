@@ -27,12 +27,9 @@ router.post('/createDeal', async (req, res) => {
       status,
       currentPrice
     })
-    console.log("deal", deal)
-    await deal.save()
-    res.json({
-      msg: "Created deal",
-      status: 200
-    })
+    
+    const dealObject = await deal.save()
+    res.json(dealObject)
   } catch (err) {
     res.status(400).json(err)
   }

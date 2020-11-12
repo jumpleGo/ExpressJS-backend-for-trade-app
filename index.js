@@ -24,6 +24,10 @@ const getChartData        = require('./routes/trade/getChartData')
 const createDeal          = require('./routes/deals/createDeal')
 const checkAuth           = require('./routes/auth/checkAuth')
 const updateBalance       = require('./routes/user/updateBalance')
+const getDeals            = require('./routes/deals/getDeals')
+const updateDeal          = require('./routes/deals/updateDeal')
+const getCandleData       = require('./routes/trade/getCandleData')
+
 
 /* Application initialization */
 const app = express()
@@ -51,6 +55,9 @@ app.use('/api', getChartData)
 app.use('/api', createDeal)
 app.use('/api', checkAuth)
 app.use('/api', updateBalance)
+app.use('/api', getDeals)
+app.use('/api', updateDeal)
+app.use('/api', getCandleData)
 
 
 // Error middleware after all routes
@@ -68,6 +75,7 @@ app.use(function (err, req, res, next) {
 async function start() {
   try {
     let tradeData     = null
+    let tradeCandle   = null
     const binance     = new ccxws.Binance()
     await mongoose.connect('mongodb+srv://emil:emil1111@cluster0.e1kvc.mongodb.net/traiding', {
       useUnifiedTopology: true, 
@@ -95,16 +103,13 @@ async function start() {
         if (!currMarket) {
           currMarket = market
           await binance.subscribeTrades(currMarket)
-          console.log('sub')
           await binance.on("trade", trade => tradeData = trade)
 
         }else if (currMarket.id !== market.id) {
-          console.log('unsub')
           await binance.unsubscribeTrades(currMarket)
           tradeData = null
           currMarket = market
           await binance.subscribeTrades(currMarket)
-
           await binance.on("trade", trade => tradeData = trade)
         }
       });
