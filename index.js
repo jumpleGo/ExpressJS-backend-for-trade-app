@@ -6,8 +6,6 @@ const path        = require('path')
 const helmet      = require('helmet')
 const cors        = require('cors')
 const ccxws       = require("ccxws");
-let currMarket    = null
-const socketUsers = require('socket.io.users');
                     require('dotenv').config()
 
 /* Api */
@@ -31,8 +29,6 @@ const getCandleData       = require('./routes/trade/getCandleData')
 
 /* Application initialization */
 const app = express()
-
-socketUsers.Session(app)
 
 /* For access to public files */
 app.use(express.static(path.join(__dirname, 'public')))
@@ -74,65 +70,59 @@ app.use(function (err, req, res, next) {
 
 async function start() {
   try {
-    let tradeData     = null
-    let tradeCandle   = null
-    const binance     = new ccxws.Binance()
     await mongoose.connect('mongodb+srv://emil:emil1111@cluster0.e1kvc.mongodb.net/traiding', {
       useUnifiedTopology: true, 
       useNewUrlParser: true,
       useFindAndModify: false
     })
-    
-    const server    = app.listen(3000)
-          io        = require('socket.io')(server);
-          rootUsers = socketUsers.Users
-
-    io.use(socketUsers.Middleware());
-
-    rootUsers.on('connected', function(user){
-      console.log('User has connected with ID: '+ user.id);
-    });
-    
-    rootUsers.on('disconnected',function(user){
-      console.log('User with ID: '+user.id+'is gone away :(');
-    });
+    const server      = app.listen(3000)
+          io          = require('socket.io')(server);
     
     io.on('connection', function(socket){
+      const binance     = new ccxws.Binance()
+      let userId = socket.handshake.query.userID
+
+      let currMarket    = null
+      let socketConnection = socket.id
+      let tradeData     = {
+        candle: null,
+        line: null
+      }
 
       socket.on('SEND_MESSAGE', async function(market) {
         if (!currMarket) {
           currMarket = market
-          await binance.subscribeTrades(currMarket)
-          await binance.subscribeCandles(currMarket)
+          binance.subscribeTrades(currMarket)
+          binance.subscribeCandles(currMarket)
 
-          await binance.on("trade", trade => tradeData = trade)
-          await binance.on("candle", candle => tradeCandle = candle)
+          binance.on("trade", trade => tradeData.line = trade)
+          binance.on("candle", candle => tradeData.candle = candle)
 
         }else if (currMarket.id !== market.id) {
-          await binance.unsubscribeTrades(currMarket)
-          await binance.unsubscribeCandles(currMarket)
-          tradeData = null
-          tradeCandle = null
+          binance.unsubscribeTrades(currMarket)
+          binance.unsubscribeCandles(currMarket)
+          tradeData.line = null
+          tradeData.candle = null
 
           currMarket = market
-          await binance.subscribeTrades(currMarket)
-          await binance.subscribeCandles(currMarket)
+          binance.subscribeTrades(currMarket)
+          binance.subscribeCandles(currMarket)
 
-          await binance.on("trade", trade => tradeData = trade)
-          await binance.on("candle", candle => tradeCandle = candle)
+          binance.on("trade", trade => tradeData.line = trade)
+          binance.on("candle", candle => tradeData.candle = candle)
         }
+
+        setInterval(() => {
+          if (tradeData.line) {
+            io.to(socketConnection).emit('MESSAGE_TRADE', tradeData.line)
+          }
+          if (tradeData.candle) {
+            io.to(socketConnection).emit('MESSAGE_CANDLE', tradeData.candle)
+          }
+        }, 2000)
       });
 
     });
-
-    setInterval(() => {
-      if (tradeData) {
-        io.emit('MESSAGE_TRADE', tradeData)
-      }
-      if (tradeCandle) {
-        io.emit('MESSAGE_CANDLE', tradeCandle)
-      }
-    }, 1000)
 
   } catch (e) {
     console.log(e)

@@ -5,6 +5,14 @@ const deal = new Schema({
     type: String,
     required: true
   },
+  base: {
+    type: String,
+    required: true
+  },
+  quote: {
+    type: String,
+    required: true
+  },
   user: {
     type: String,
     required: true
