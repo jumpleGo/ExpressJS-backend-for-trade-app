@@ -25,6 +25,8 @@ const updateBalance       = require('./routes/user/updateBalance')
 const getDeals            = require('./routes/deals/getDeals')
 const updateDeal          = require('./routes/deals/updateDeal')
 const getCandleData       = require('./routes/trade/getCandleData')
+const createWithdrawal    = require('./routes/withdrawals/createWithdrawal')
+const getWithdrawals       = require('./routes/withdrawals/getWithdrawals')
 
 
 /* Application initialization */
@@ -54,6 +56,8 @@ app.use('/api', updateBalance)
 app.use('/api', getDeals)
 app.use('/api', updateDeal)
 app.use('/api', getCandleData)
+app.use('/api', createWithdrawal)
+app.use('/api', getWithdrawals)
 
 
 // Error middleware after all routes
@@ -80,7 +84,6 @@ async function start() {
     
     io.on('connection', function(socket){
       const binance     = new ccxws.Binance()
-      let userId = socket.handshake.query.userID
 
       let currMarket    = null
       let socketConnection = socket.id
@@ -99,10 +102,10 @@ async function start() {
           binance.on("candle", candle => tradeData.candle = candle)
 
         }else if (currMarket.id !== market.id) {
-          binance.unsubscribeTrades(currMarket)
-          binance.unsubscribeCandles(currMarket)
           tradeData.line = null
           tradeData.candle = null
+          binance.unsubscribeTrades(currMarket)
+          binance.unsubscribeCandles(currMarket)
 
           currMarket = market
           binance.subscribeTrades(currMarket)
