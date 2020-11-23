@@ -5,6 +5,8 @@ const bodyParser  = require('body-parser')
 const path        = require('path')
 const helmet      = require('helmet')
 const cors        = require('cors')
+var fs            = require('fs'); 
+var path          = require('path'); 
 const ccxws       = require("ccxws");
                     require('dotenv').config()
 
@@ -26,7 +28,9 @@ const getDeals            = require('./routes/deals/getDeals')
 const updateDeal          = require('./routes/deals/updateDeal')
 const getCandleData       = require('./routes/trade/getCandleData')
 const createWithdrawal    = require('./routes/withdrawals/createWithdrawal')
-const getWithdrawals       = require('./routes/withdrawals/getWithdrawals')
+const getWithdrawals      = require('./routes/withdrawals/getWithdrawals')
+const merchant            = require('./routes/merchant/merchant')
+const createVerificationRequest  = require('./routes/verify/createVerificationRequest')
 
 
 /* Application initialization */
@@ -58,6 +62,8 @@ app.use('/api', updateDeal)
 app.use('/api', getCandleData)
 app.use('/api', createWithdrawal)
 app.use('/api', getWithdrawals)
+app.use('/api', merchant)
+app.use('/api', createVerificationRequest)
 
 
 // Error middleware after all routes
