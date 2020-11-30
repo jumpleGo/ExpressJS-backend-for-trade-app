@@ -5,8 +5,6 @@ const bodyParser  = require('body-parser')
 const path        = require('path')
 const helmet      = require('helmet')
 const cors        = require('cors')
-var fs            = require('fs'); 
-var path          = require('path'); 
 const ccxws       = require("ccxws");
                     require('dotenv').config()
 
@@ -30,6 +28,7 @@ const getCandleData       = require('./routes/trade/getCandleData')
 const createWithdrawal    = require('./routes/withdrawals/createWithdrawal')
 const getWithdrawals      = require('./routes/withdrawals/getWithdrawals')
 const merchant            = require('./routes/merchant/merchant')
+const getVerifyRequest    = require('./routes/verify/getVerifyRequest')
 const createVerificationRequest  = require('./routes/verify/createVerificationRequest')
 
 
@@ -39,9 +38,12 @@ const app = express()
 /* For access to public files */
 app.use(express.static(path.join(__dirname, 'public')))
 
+
 /* Parse incoming requests */
 app.use(bodyParser.urlencoded({ extended: false })) // x-www-urlencoded
-app.use(bodyParser.json()) // json
+app.use(bodyParser.json({limit:1024*1024*20, type:'application/json'}))
+app.use(bodyParser.urlencoded({ extended:true,limit:1024*1024*20,type:'application/x-www-form-urlencoded' }))
+
 
 app.use(helmet())
 
@@ -64,6 +66,7 @@ app.use('/api', createWithdrawal)
 app.use('/api', getWithdrawals)
 app.use('/api', merchant)
 app.use('/api', createVerificationRequest)
+app.use('/api', getVerifyRequest)
 
 
 // Error middleware after all routes
@@ -85,6 +88,7 @@ async function start() {
       useNewUrlParser: true,
       useFindAndModify: false
     })
+
     const server      = app.listen(3000)
           io          = require('socket.io')(server);
     

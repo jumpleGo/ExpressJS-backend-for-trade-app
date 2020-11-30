@@ -4,14 +4,15 @@ const MWithd       = require('../../models/MWithd')
 
 router.post('/createWithdrawal', async (req, res) => {
   try {
-    const { amount, userId, date, status, card } = req.body
+    const { amount, userId, date, status, card, type } = req.body
 
     const withdrawal = new MWithd({
       user: userId,
       amount,
       date,
       status,
-      card
+      card,
+      type
     })
     
     const wObject = await withdrawal.save()

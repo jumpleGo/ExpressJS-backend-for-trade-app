@@ -6,7 +6,7 @@ const withdSchema = new Schema({
     required: true
   },
   card: {
-    type: Number,
+    type: String,
     required: true
   },
   user: {
@@ -19,8 +19,12 @@ const withdSchema = new Schema({
   },
   status: {
     type: String,
-    default: false
+    required: true
   },
+  type: {
+    type: String,
+    required: true
+  }
 })
 
 module.exports = model('Withdrawal', withdSchema) 
