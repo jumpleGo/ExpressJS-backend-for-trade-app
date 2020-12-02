@@ -4,10 +4,6 @@ const MUser       = require('../../models/MUser')
 
 router.post('/checkAuth',  async (req, res) => {
   try {
-    const user = {
-      user: req.body.email,
-    }
-
     const candidate = await MUser.findOne({ email: req.body.email })
     
     if (candidate) {

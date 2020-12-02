@@ -30,6 +30,10 @@ const getWithdrawals      = require('./routes/withdrawals/getWithdrawals')
 const merchant            = require('./routes/merchant/merchant')
 const getVerifyRequest    = require('./routes/verify/getVerifyRequest')
 const createVerificationRequest  = require('./routes/verify/createVerificationRequest')
+const users               = require('./routes/admin/users')
+const withdrawals         = require('./routes/admin/withdrawals')
+const setUsersSettings    = require('./routes/admin/setUsersSettings')
+const setWithdStatus      = require('./routes/admin/setWithdStatus')
 
 
 /* Application initialization */
@@ -67,6 +71,10 @@ app.use('/api', getWithdrawals)
 app.use('/api', merchant)
 app.use('/api', createVerificationRequest)
 app.use('/api', getVerifyRequest)
+app.use('/api', users)
+app.use('/api', setUsersSettings)
+app.use('/api', withdrawals)
+app.use('/api', setWithdStatus)
 
 
 // Error middleware after all routes
