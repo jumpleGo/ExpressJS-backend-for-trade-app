@@ -25,9 +25,17 @@ const verifySchema = new Schema({
     type: String,
     required: true
   },
+  userObject: {
+    type: Object,
+    required: true
+  },
   status: {
     type: String,
     required: true
+  },
+  archived: {
+    type: Boolean,
+    default: false
   }
 })
 

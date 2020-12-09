@@ -34,6 +34,12 @@ const users               = require('./routes/admin/users')
 const withdrawals         = require('./routes/admin/withdrawals')
 const setUsersSettings    = require('./routes/admin/setUsersSettings')
 const setWithdStatus      = require('./routes/admin/setWithdStatus')
+const platformSettings    = require('./routes/admin/platformSettings')
+const setNewSettings      = require('./routes/admin/setNewSettings')
+const imageUpload         = require('./routes/verify/imageUpload')
+const setVReqStatus        = require('./routes/admin/setVReqStatus')
+const createReferralConnection        = require('./routes/referral/createReferralConnection')
+const searchUsers         = require('./routes/admin/searchUsers')
 
 
 /* Application initialization */
@@ -75,6 +81,12 @@ app.use('/api', users)
 app.use('/api', setUsersSettings)
 app.use('/api', withdrawals)
 app.use('/api', setWithdStatus)
+app.use('/api', platformSettings)
+app.use('/api', setNewSettings)
+app.use('/api', imageUpload)
+app.use('/api', setVReqStatus)
+app.use('/api', createReferralConnection)
+app.use('/api', searchUsers)
 
 
 // Error middleware after all routes

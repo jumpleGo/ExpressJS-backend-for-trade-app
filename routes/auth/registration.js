@@ -18,7 +18,8 @@ router.post('/register', async (req, res) => {
 
       res.json({
         msg: "Created new User",
-        status: 200
+        status: 200,
+        user
       })
 
     } else {

@@ -4,14 +4,14 @@ const MUser       = require('../../models/MUser')
 
 router.post('/setUsersSettings',  async (req, res) => {
   try {
-    const { email, isAdmin, isBlocked} = req.body
+    const { email, object} = req.body
 
     const candidate = await MUser.findOne({ email })
 
     if (candidate) {
       await MUser.updateOne(
         { email }, 
-        { $set : { isAdmin,  isBlocked} }
+        { $set : { ...object} }
       )
       res.json({ data: 'updated' })      
     } else {

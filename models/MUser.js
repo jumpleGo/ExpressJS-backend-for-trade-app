@@ -28,6 +28,18 @@ const userSchema = new Schema({
   isBlocked: {
     type: Boolean,
     default: false
+  },
+  created_at: {
+    type: Date,
+    default: new Date()
+  },
+  withdrawalBlocked: {
+    type: Boolean,
+    default: false
+  },
+  deposits: {
+    type: Array,
+    required: false
   }
 })
 

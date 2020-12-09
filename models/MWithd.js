@@ -13,6 +13,10 @@ const withdSchema = new Schema({
     type: String,
     required: true
   },
+  userObject: {
+    type: Object,
+    required: true
+  },
   date: {
     type: Date,
     required: true
@@ -24,6 +28,10 @@ const withdSchema = new Schema({
   type: {
     type: String,
     required: true
+  },
+  archived: {
+    type: Boolean,
+    default: false
   }
 })
 

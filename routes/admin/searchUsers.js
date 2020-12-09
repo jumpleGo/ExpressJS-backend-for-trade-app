@@ -3,13 +3,19 @@ const router      = Router()
 const MUser       = require('../../models/MUser')
 const MDeposit    = require('../../models/MDeposit')
 
-router.get('/users', async (req, res) => {
+router.post('/searchUsers', async (req, res) => {
   try {
-    const users = await MUser.find()
+    const {search} = req.body
+    const users = await MUser.find({email: 
+      {
+        $regex: search
+      }
+    })  
     let promises = await users.map(async user => {
       const {_id} = user
-      user.deposits = await MDeposit.find({user: _id})
-      return user
+      let deposits = await MDeposit.find({user: _id})
+      user.deposits = deposits
+      return await user
     })
       
     Promise.all(promises).then(updUsers => {
