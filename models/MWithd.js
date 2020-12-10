@@ -15,7 +15,7 @@ const withdSchema = new Schema({
   },
   userObject: {
     type: Object,
-    required: true
+    required: false
   },
   date: {
     type: Date,

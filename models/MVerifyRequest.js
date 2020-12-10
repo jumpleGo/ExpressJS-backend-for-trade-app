@@ -27,7 +27,7 @@ const verifySchema = new Schema({
   },
   userObject: {
     type: Object,
-    required: true
+    required: false
   },
   status: {
     type: String,
