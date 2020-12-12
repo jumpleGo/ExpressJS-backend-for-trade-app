@@ -40,6 +40,8 @@ const imageUpload         = require('./routes/verify/imageUpload')
 const setVReqStatus        = require('./routes/admin/setVReqStatus')
 const createReferralConnection        = require('./routes/referral/createReferralConnection')
 const searchUsers         = require('./routes/admin/searchUsers')
+const getPartnerByUser    = require('./routes/referral/getPartnerByUser')
+const getReferralsByUser  = require('./routes/referral/getReferralsByUser')
 
 
 /* Application initialization */
@@ -87,7 +89,8 @@ app.use('/api', imageUpload)
 app.use('/api', setVReqStatus)
 app.use('/api', createReferralConnection)
 app.use('/api', searchUsers)
-
+app.use('/api', getPartnerByUser)
+app.use('/api', getReferralsByUser)
 
 // Error middleware after all routes
 app.use(function (err, req, res, next) {
