@@ -44,6 +44,8 @@ const getPartnerByUser    = require('./routes/referral/getPartnerByUser')
 const getReferralsByUser  = require('./routes/referral/getReferralsByUser')
 const getPartners         = require('./routes/referral/getPartners')
 const setPercentToPartner = require('./routes/referral/setPercentToPartner')
+const getPromocodes       = require('./routes/promocodes/getPromocodes')
+const createPromocodes    = require('./routes/promocodes/createPromocodes')
 
 
 /* Application initialization */
@@ -95,6 +97,8 @@ app.use('/api', getPartnerByUser)
 app.use('/api', getReferralsByUser)
 app.use('/api', getPartners)
 app.use('/api', setPercentToPartner)
+app.use('/api', getPromocodes)
+app.use('/api', createPromocodes)
 
 // Error middleware after all routes
 app.use(function (err, req, res, next) {

@@ -5,7 +5,11 @@ const promocode = new Schema({
     type: String,
     default: 'BALANCE'
   },
-  value: {
+  created_at: {
+    type: Date,
+    default: new Date()
+  },
+  code: {
     type: String,
     required: true
   },
