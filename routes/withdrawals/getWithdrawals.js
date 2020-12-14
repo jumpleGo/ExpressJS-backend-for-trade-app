@@ -6,7 +6,6 @@ router.post('/getWithdrawals', async (req, res) => {
   try {
     const { userId } = req.body
     const w = await MWithd.find({user: userId})
-    console.log("userId", userId)
 
     res.json(w)
   } catch (err) {

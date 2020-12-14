@@ -7,7 +7,7 @@ router.post('/getPartnerByUser', async (req, res) => {
   let { userId } = req.body
  
   const referralObject = await MReferralConnection.findOne({referral: userId})
-  console.log("🚀 ~ file: getPartnerByUser.js ~ line 10 ~ router.post ~ referralObject", referralObject)
+  
   if (referralObject) {
     const { main } = referralObject
   

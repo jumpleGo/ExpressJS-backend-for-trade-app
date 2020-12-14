@@ -42,6 +42,8 @@ const createReferralConnection        = require('./routes/referral/createReferra
 const searchUsers         = require('./routes/admin/searchUsers')
 const getPartnerByUser    = require('./routes/referral/getPartnerByUser')
 const getReferralsByUser  = require('./routes/referral/getReferralsByUser')
+const getPartners         = require('./routes/referral/getPartners')
+const setPercentToPartner = require('./routes/referral/setPercentToPartner')
 
 
 /* Application initialization */
@@ -91,6 +93,8 @@ app.use('/api', createReferralConnection)
 app.use('/api', searchUsers)
 app.use('/api', getPartnerByUser)
 app.use('/api', getReferralsByUser)
+app.use('/api', getPartners)
+app.use('/api', setPercentToPartner)
 
 // Error middleware after all routes
 app.use(function (err, req, res, next) {

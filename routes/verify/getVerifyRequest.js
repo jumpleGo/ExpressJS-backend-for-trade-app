@@ -16,10 +16,7 @@ router.post('/getVerifyRequest', async (req, res) => {
         v.userObject = await MUser.findOne({_id: v.user})
         return v
       })
-      Promise.all(promises).then(objects => {
-        console.log("🚀 ~ file: getVerifyRequest.js ~ line 20 ~ Promise.all ~ objects", objects)
-        res.json(objects)
-      })
+      Promise.all(promises).then(objects => res.json(objects))
     }
   } catch (err) {
     res.status(400).json(err)

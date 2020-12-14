@@ -5,6 +5,10 @@ const partner = new Schema({
     type: String,
     required: true
   },
+  userObject: {
+    type: Object,
+    default: {}
+  },
   percent: {
     type: Number,
     default: 10

@@ -5,18 +5,18 @@ const MPartner    = require('../../models/MPartner')
 
 router.post('/createReferralConnection', async (req, res) => {
   try {
-    let { ref, user, date } = req.body
+    let { partner, user, date } = req.body
 
-    const partner = await MPartner.findOne({user: ref})
-    if (!partner) {
+    const partnerModel = await MPartner.findOne({user: partner})
+    if (!partnerModel) {
       const partnerObj = new MPartner({
-        user: ref
+        user: partner
       })
       await partnerObj.save()
     }
     
     const refObj = new MReferralConnection({
-      main: ref, referral: user, date
+      main: partner, referral: user, date
     })
     
     await refObj.save()

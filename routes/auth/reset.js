@@ -6,7 +6,6 @@ const nodemailer  = require('nodemailer');
 
 router.post('/reset', async (req, res) => {
   try {
-    console.log(" req.body",  req.body)
     const candidate = await MUser.findOne({ email: req.body.email })
     
     
