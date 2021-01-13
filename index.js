@@ -46,6 +46,9 @@ const getPartners         = require('./routes/referral/getPartners')
 const setPercentToPartner = require('./routes/referral/setPercentToPartner')
 const getPromocodes       = require('./routes/promocodes/getPromocodes')
 const createPromocodes    = require('./routes/promocodes/createPromocodes')
+const checkPromocode      = require('./routes/promocodes/checkPromocode')
+const deactivatePromocode = require('./routes/promocodes/deactivatePromocode')
+const getDeposits         = require('./routes/deposit/getDeposits')
 
 
 /* Application initialization */
@@ -54,12 +57,9 @@ const app = express()
 /* For access to public files */
 app.use(express.static(path.join(__dirname, 'public')))
 
-
+app.use(express.json())
 /* Parse incoming requests */
 app.use(bodyParser.urlencoded({ extended: false })) // x-www-urlencoded
-app.use(bodyParser.json({limit:1024*1024*20, type:'application/json'}))
-app.use(bodyParser.urlencoded({ extended:true,limit:1024*1024*20,type:'application/x-www-form-urlencoded' }))
-
 
 app.use(helmet())
 
@@ -99,6 +99,9 @@ app.use('/api', getPartners)
 app.use('/api', setPercentToPartner)
 app.use('/api', getPromocodes)
 app.use('/api', createPromocodes)
+app.use('/api', checkPromocode)
+app.use('/api', deactivatePromocode)
+app.use('/api', getDeposits)
 
 // Error middleware after all routes
 app.use(function (err, req, res, next) {

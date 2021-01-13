@@ -1,15 +1,15 @@
 const {Schema, model} = require('mongoose')
 
 const settings = new Schema({
-  minAmount: {
+  minAmountForWithdrawal: {
     type: Number,
     required: true
   },
-  minAmountUpBalance: {
+  minAmountForUp: {
     type: Number,
     required: true
   },
-  allDepositsAmount: {
+  allDepositsForWithdrawal: {
     type: Number,
     required: true
   }

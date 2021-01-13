@@ -5,8 +5,8 @@ const MPromoCode  = require('../../models/MPromoCode')
 router.get('/getPromocodes', async (req, res) => {
  
   try {
-    const proocodes = await MPromoCode.find()
-    res.json(proocodes.reverse())
+    const promocodes = await MPromoCode.find()
+    res.json(promocodes.reverse())
   } catch (err) {
     console.log(err)
   }
