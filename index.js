@@ -10,6 +10,8 @@ const ccxws       = require("ccxws");
 
 /* Api */
 const subscribeForTrades = require('./api/subscribeForTrades')
+const calculateLoseDeal  = require('./middleware/calculateLoseDeal')
+const getLimitTradesData  = require('./api/getLimitTradesData')
 /* Modules */
 
 
@@ -125,47 +127,103 @@ async function start() {
 
     const server      = app.listen(3000)
           io          = require('socket.io')(server);
+
+    
     
     io.on('connection', function(socket){
-      const binance     = new ccxws.Binance()
-
-      let currMarket    = null
+      const binance   = new ccxws.Binance()
+      let subTradeT
+      let currMarket  = null
       let socketConnection = socket.id
-      let tradeData     = {
-        candle: null,
-        line: null
+      let tradeData   = {
+        candle: [],
+        line: []
       }
 
+      let controlData = {
+        price: null,
+        trend: null
+      }
+
+      let middleWareTradeData = null
+      let middleWareCandleData = null
+
+
+      setInterval(() => {
+        console.log(middleWareTradeData)
+        if (middleWareTradeData) {
+          tradeData.line.push({
+            ...middleWareTradeData,
+            unix: new Date().setMinutes(new Date().getMinutes() + 1)
+          })
+        }
+        if (middleWareCandleData) {
+          tradeData.candle.push({
+            ...middleWareCandleData,
+            t: new Date().setMinutes(new Date().getMinutes() + 1)
+          })
+        }
+      }, 2000)
+
+  
+      socket.on('SEND_CONTROL_COMAND', async function ({price, trend}) {
+        controlData = {price, trend}
+      })
+      socket.on('CLOSE_CONTROL_COMAND', async function () {
+        controlData = {price: null, trend: null}
+      })
       socket.on('SEND_MESSAGE', async function(market) {
         if (!currMarket) {
+          const lastMinuteTradeData = await getLimitTradesData(market.base)
+          tradeData.line = lastMinuteTradeData.lineData
+          tradeData.candle = lastMinuteTradeData.candleData
+
           currMarket = market
           binance.subscribeTrades(currMarket)
           binance.subscribeCandles(currMarket)
+          
 
-          binance.on("trade", trade => tradeData.line = trade)
-          binance.on("candle", candle => tradeData.candle = candle)
+          binance.on("trade",  trade => middleWareTradeData = trade)
+          binance.on("candle", candle => middleWareCandleData = candle)
 
         }else if (currMarket.id !== market.id) {
-          tradeData.line = null
-          tradeData.candle = null
           binance.unsubscribeTrades(currMarket)
           binance.unsubscribeCandles(currMarket)
+          middleWareTradeData = null
+          middleWareCandleData = null
+          tradeData.line = []
+          tradeData.candle = []
 
           currMarket = market
-          binance.subscribeTrades(currMarket)
-          binance.subscribeCandles(currMarket)
+          const lastMinuteTradeData = await getLimitTradesData(currMarket.base)
+          tradeData.line = lastMinuteTradeData.lineData
+          tradeData.candle = lastMinuteTradeData.candleData
 
-          binance.on("trade", trade => tradeData.line = trade)
-          binance.on("candle", candle => tradeData.candle = candle)
+          await binance.subscribeTrades(currMarket)
+          await binance.subscribeCandles(currMarket)
+          
+
+          binance.on("trade",  trade => middleWareTradeData = trade)
+          binance.on("candle", candle => middleWareCandleData = candle)
+
         }
 
-        setInterval(() => {
-          if (tradeData.line) {
-            io.to(socketConnection).emit('MESSAGE_TRADE', tradeData.line)
+        setInterval(function() {
+          if (tradeData.line[0]) {
+            if (controlData.price) {
+              io.to(socketConnection).emit('MESSAGE_TRADE', {
+                ...tradeData.line[0],
+                price: calculateLoseDeal(+tradeData.line[0].price, controlData.price, controlData.trend)
+              })
+            } else {
+              io.to(socketConnection).emit('MESSAGE_TRADE', tradeData.line[0])
+            }
           }
-          if (tradeData.candle) {
-            io.to(socketConnection).emit('MESSAGE_CANDLE', tradeData.candle)
+          if (tradeData.candle[0]) {
+            io.to(socketConnection).emit('MESSAGE_CANDLE', tradeData.candle[0])
           }
+          tradeData.line.shift()
+          tradeData.candle.shift() 
         }, 2000)
       });
 
