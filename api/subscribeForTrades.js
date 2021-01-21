@@ -7,7 +7,9 @@ const deleteOldCandles  = require('./deleteOldCandles')
 async function subscribeForTrades () {
   /* Trade options */
   const options = await MPair.find()
-
+  let dateForNextMinute = () => {
+    return  new Date().setMinutes(new Date().getMinutes() + 1)
+  }
   async function subscribeForTrade (market, binance) {
     let tradeData
     let tradeCandle
@@ -19,7 +21,7 @@ async function subscribeForTrades () {
     
     await setInterval(async () => {
       if (tradeData) {
-        await addTradeToDb(tradeData, 'line')
+        await addTradeToDb({...tradeData, unix: dateForNextMinute() }, 'line')
       }
       if (tradeCandle) {
         await addTradeToDb(tradeCandle, 'candle', market.id)

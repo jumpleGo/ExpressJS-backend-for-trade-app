@@ -6,7 +6,8 @@ router.post('/getChartData', async (req, res) => {
   try {
     let {base} = req.body
     const chartData = await MTrade.find({base})
-    res.json(chartData)
+    let cutsChartData = chartData.splice(0, chartData.length - 30)
+    res.json(cutsChartData)
   } catch (err) {
     res.status(400).json(err)
   }

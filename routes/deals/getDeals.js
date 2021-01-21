@@ -5,7 +5,7 @@ const MDeal       = require('../../models/MDeal')
 router.post('/getDeals', async (req, res) => {
   try {
     const { userId } = req.body
-    const deals = await MDeal.find({user: userId}).sort('-date').limit(10)
+    const deals = await MDeal.find({user: userId}).sort({'_id': -1}).limit(10)
 
     res.json(deals)
   } catch (err) {
