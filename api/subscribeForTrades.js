@@ -24,7 +24,7 @@ async function subscribeForTrades () {
         await addTradeToDb({...tradeData, unix: dateForNextMinute() }, 'line')
       }
       if (tradeCandle) {
-        await addTradeToDb(tradeCandle, 'candle', market.id)
+        await addTradeToDb({...tradeCandle, t: dateForNextMinute()}, 'candle', market.id)
       }
     }, 2000)
   }

@@ -150,7 +150,6 @@ async function start() {
 
 
       setInterval(() => {
-        console.log(middleWareTradeData)
         if (middleWareTradeData) {
           tradeData.line.push({
             ...middleWareTradeData,
@@ -198,35 +197,34 @@ async function start() {
           const lastMinuteTradeData = await getLimitTradesData(currMarket.base)
           tradeData.line = lastMinuteTradeData.lineData
           tradeData.candle = lastMinuteTradeData.candleData
-
-          await binance.subscribeTrades(currMarket)
-          await binance.subscribeCandles(currMarket)
+          
+          binance.subscribeTrades(currMarket)
+          binance.subscribeCandles(currMarket)
           
 
           binance.on("trade",  trade => middleWareTradeData = trade)
           binance.on("candle", candle => middleWareCandleData = candle)
 
         }
-
-        setInterval(function() {
-          if (tradeData.line[0]) {
-            if (controlData.price) {
-              io.to(socketConnection).emit('MESSAGE_TRADE', {
-                ...tradeData.line[0],
-                price: calculateLoseDeal(+tradeData.line[0].price, controlData.price, controlData.trend)
-              })
-            } else {
-              io.to(socketConnection).emit('MESSAGE_TRADE', tradeData.line[0])
-            }
-          }
-          if (tradeData.candle[0]) {
-            io.to(socketConnection).emit('MESSAGE_CANDLE', tradeData.candle[0])
-          }
-          tradeData.line.shift()
-          tradeData.candle.shift() 
-        }, 2000)
       });
-
+      
+      setInterval(function() {
+        if (tradeData.line[0]) {
+          if (controlData.price) {
+            io.to(socketConnection).emit('MESSAGE_TRADE', {
+              ...tradeData.line[0],
+              price: calculateLoseDeal(+tradeData.line[0].price, controlData.price, controlData.trend)
+            })
+          } else {
+            io.to(socketConnection).emit('MESSAGE_TRADE', tradeData.line[0])
+          }
+        }
+        if (tradeData.candle[0]) {
+          io.to(socketConnection).emit('MESSAGE_CANDLE', tradeData.candle[0])
+        }
+        tradeData.line.shift()
+        tradeData.candle.shift() 
+      }, 2000)
     });
 
   } catch (e) {
