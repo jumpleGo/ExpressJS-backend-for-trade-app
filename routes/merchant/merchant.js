@@ -37,6 +37,12 @@ router.post('/merchant', upload.none(), async (req, res) => {
         { _id: payment_info_data[0] }, 
         { $set : { balance } }
       )
+      if (candidate.demoBalance > 0) {
+        await MUser.updateOne(
+          { _id: payment_info_data[0] }, 
+          { $set : { demoBalance: 0 } }
+        )
+      }
 
       //CHECK FOR REFERRAL
       const meReferral = await MReferralConnection.findOne({referral: payment_info_data[0]})

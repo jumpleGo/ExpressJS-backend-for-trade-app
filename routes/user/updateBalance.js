@@ -4,17 +4,17 @@ const MUser       = require('../../models/MUser')
 
 router.post('/updateBalance',  async (req, res) => {
   try {
-    const { email, amount, type } = req.body
+    const { email, amount, type, mode } = req.body
 
     const candidate = await MUser.findOne({ email })
     let balance = type === 'minus' 
-      ? candidate.balance - amount 
-      : candidate.balance + amount
+      ? candidate[mode] - amount 
+      : candidate[mode] + amount
 
     if (candidate) {
       await MUser.updateOne(
         { email }, 
-        { $set : { balance } }
+        { $set : { [mode]: balance } }
       )
       res.json({ data: 'updated' })      
     } else {
