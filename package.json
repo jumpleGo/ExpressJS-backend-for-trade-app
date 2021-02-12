@@ -13,6 +13,7 @@
   "dependencies": {
     "aws-sdk": "^2.803.0",
     "bcryptjs": "^2.4.3",
+    "block_io": "^3.0.4",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
     "ccxws": "^0.39.2",

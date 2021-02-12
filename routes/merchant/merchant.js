@@ -14,8 +14,7 @@ router.post('/merchant', upload.none(), async (req, res) => {
     let partnerEaring = 0
     let promoAmount = null
     const payment_info_data = payment_info.split(';')
-    console.log("🚀 ~ file: merchant.js ~ line 17 ~ router.post ~ payment_info_data", payment_info_data)
-    
+     
     if (payment_info && amount) {
       res.status(200).send('*ok*')
       //CHECK FOR PROMOCODE

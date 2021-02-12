@@ -13,12 +13,20 @@ const deposit = new Schema({
     type: String,
     required: true
   },
+  userData: {
+    type: Object,
+    required: false
+  },
   amount: {
     type: Number,
     required: true
   },
-  orderId: {
+  cryptoAmount: {
     type: Number,
+    required: true
+  },
+  type: {
+    type: String,
     required: true
   },
   partnerEaring: {

@@ -51,7 +51,10 @@ const createPromocodes    = require('./routes/promocodes/createPromocodes')
 const checkPromocode      = require('./routes/promocodes/checkPromocode')
 const deactivatePromocode = require('./routes/promocodes/deactivatePromocode')
 const getDeposits         = require('./routes/deposit/getDeposits')
-
+const getCryptoAddress    = require('./routes/cryptoDep/getCryptoAddress')
+const getLastPrice        = require('./routes/trade/getLastPrice')
+const watchForBalance     = require('./routes/cryptoDep/watchForBalance')
+const getCurrentPriceForTransaction = require('./routes/cryptoDep/getCurrentPriceForTransaction')
 
 /* Application initialization */
 const app = express()
@@ -104,6 +107,10 @@ app.use('/api', createPromocodes)
 app.use('/api', checkPromocode)
 app.use('/api', deactivatePromocode)
 app.use('/api', getDeposits)
+app.use('/api', getCryptoAddress)
+app.use('/api', getLastPrice)
+app.use('/api', getCurrentPriceForTransaction)
+app.use('/api', watchForBalance)
 
 // Error middleware after all routes
 app.use(function (err, req, res, next) {
@@ -132,7 +139,6 @@ async function start() {
     
     io.on('connection', function(socket){
       const binance   = new ccxws.Binance()
-      let subTradeT
       let currMarket  = null
       let socketConnection = socket.id
       let tradeData   = {
