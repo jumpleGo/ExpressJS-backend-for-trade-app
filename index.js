@@ -12,6 +12,8 @@ const ccxws       = require("ccxws");
 const subscribeForTrades = require('./api/subscribeForTrades')
 const calculateLoseDeal  = require('./middleware/calculateLoseDeal')
 const getLimitTradesData  = require('./api/getLimitTradesData')
+const https = require('https');
+const fs = require('fs');
 /* Modules */
 
 
@@ -132,8 +134,14 @@ async function start() {
       useFindAndModify: false
     })
 
+    
+    // const httpsServer = https.createServer({
+    //   key: fs.readFileSync('/etc/letsencrypt/live/api.oceanoption.ru/privkey.pem'),
+    //   cert: fs.readFileSync('/etc/letsencrypt/live/api.oceanoption.ru/fullchain.pem'),
+    // }, app);
+    // const server      = httpsServer.listen(3000)
     const server      = app.listen(3000)
-          io          = require('socket.io')(server);
+    const io          = require('socket.io')(server);
 
     
     

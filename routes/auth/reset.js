@@ -34,7 +34,7 @@ router.post('/reset', async (req, res) => {
         { $set : { password: hashPassword } }
       )
 
-      res.status(200).json({ data: 'sended'})
+      res.json({ data: 'sended'})
 
     } else {
       res.json({ error: 'email_not_found'})

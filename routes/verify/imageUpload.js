@@ -29,7 +29,7 @@ router.post('/uploadImage', async (req, res) => {
     storage: multerS3({
       acl: "public-read",
       s3,
-      bucket: 'verification-request-basket',
+      bucket: 'oceanoptionbusket',
       metadata: function (req, file, cb) {
         cb(null, { type: file.mimetype });
       },
@@ -46,7 +46,7 @@ router.post('/uploadImage', async (req, res) => {
       console.log('err', err)
     }
     else {
-      res.json({link: `https://verification-request-basket.s3.us-east-2.amazonaws.com/${req.body.name}`})
+      res.json({link: `https://oceanoptionbusket.s3.us-east-2.amazonaws.com/${req.body.name}`})
     }
   })
 })
